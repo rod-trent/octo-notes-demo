@@ -19,9 +19,7 @@ jobs:
     env:
       DEPLOY_TOKEN: ${{ secrets.DEMO_DEPLOY_TOKEN }}   # a FAKE secret for the demo
     steps:
-      - name: Greet and classify the new issue
+      - name: Greet the issue author
         run: |
           echo "Thanks for opening: ${{ github.event.issue.title }}"
-          if [[ "${{ github.event.issue.title }}" == *"bug"* ]]; then
-            echo "Looks like a bug report"
-          fi
+          echo "A maintainer will take a look soon."
