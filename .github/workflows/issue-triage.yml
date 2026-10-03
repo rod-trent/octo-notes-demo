@@ -1,25 +1,26 @@
-# INTENTIONALLY VULNERABLE: GitHub Actions script injection demo.
-# The issue title is attacker-controlled, and ${{ }} pastes it straight into
-# the shell script before bash ever runs.
+# HARDENED version of issue-triage.yml
+#  1. Untrusted input goes through an environment variable, never ${{ }} in run:
+#     (the shell treats $TITLE as data, not code).
+#  2. Least-privilege GITHUB_TOKEN.
+#  3. No secrets in a job that touches untrusted input.
+#  4. Third-party actions pinned to a full commit SHA (none needed here).
 name: Issue triage
 
 on:
   issues:
     types: [opened]
 
-permissions:
-  issues: write
-  contents: read
+permissions: {}
 
 jobs:
   triage:
-    # Demo safety guard: only the repo owner's issues trigger this job.
-    if: github.event.issue.user.login == github.repository_owner
     runs-on: ubuntu-latest
-    env:
-      DEPLOY_TOKEN: ${{ secrets.DEMO_DEPLOY_TOKEN }}   # a FAKE secret for the demo
+    permissions:
+      issues: write
     steps:
       - name: Greet the issue author
+        env:
+          TITLE: ${{ github.event.issue.title }}
         run: |
-          echo "Thanks for opening: ${{ github.event.issue.title }}"
+          echo "Thanks for opening: $TITLE"
           echo "A maintainer will take a look soon."
